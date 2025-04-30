@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">CongratsApp</string>
+    <string name="main_screen_title">Best Practices in Animations with Jetpack Compose</string>
+    <string name="composable_animations_title">Composable Animations</string>
+    <string name="confetti_animation_button">Confetti Animation With Canvas</string>
+    <string name="composable_animations_button">Composable Animations</string>
+    <string name="lottie_button">Lottie</string>
+    <string name="toggle_box_visibility">Show/Hide</string>
+    <string name="change_box_color">Change color</string>
+    <string name="change_box_size">Change size</string>
+</resources>
