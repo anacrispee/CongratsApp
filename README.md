@@ -1,4 +1,4 @@
-# Boas práticas em animações com Jetpack Compose
+# Estudo de boas práticas em animações com Jetpack Compose
 ## 1. Objetivo da pesquisa
 * Estudar as melhores práticas em animações no Android
 * Desenvolver uma animação Confetti conforme o [vídeo-exemplo](https://dribbble.com/shots/16973988-Perk-Hero-Level-Up-Animation) sugerido no desafio de apresentações semanais do grupo de estudos.
@@ -11,13 +11,184 @@ Quando queremos implementar uma animação em nosso aplicativo, temos de ver se 
 Referência: https://developer.android.com/develop/ui/compose/animation/choose-api
 
 ## 3. Primeira abordagem - Canvas e laços de repetição
-Nesta abordagem o objetivo é desenvolver animações utilizando o Canvas, uma API de desenho de formas primitivas e pintura junto com laços de repetição. 
-São criadas formas cujas propriedades se alteram de acordo com os laços: tamanho, cor, posição na tela e outros, tudo é renderizado em tempo de execução.
+Nesta abordagem o objetivo é desenvolver animações utilizando o Canvas (uma API de desenho de formas primitivas e pintura) junto com laços de repetição.
+São criadas formas cujas propriedades se alteram de acordo com os laços: tamanho, cor, posição na tela e outros. Tudo é renderizado em tempo de execução.
+
+Inicialmente é criado o modelo de confetti que terá as seguintes propriedades:
+```kotlin
+data class ConfettiParticle(
+    var position: Offset,
+    var velocity: Offset,
+    var color: Color,
+    var size: Float,
+    var rotation: Float = 0f,
+    var alpha: Float = 1f
+)
+```
+
+Após isto, definimos o comportamento do confetti através dos seguintes métodos:
+```kotlin
+class ConfettiState {
+    val particles: SnapshotStateList<ConfettiParticle> = mutableStateListOf()
+
+    fun addParticle(
+        position: Offset,
+        color: Color,
+        size: Float
+    ) {
+        val randomXVelocity = Random.nextFloat() * 20f - 10f
+        val randomYVelocity = Random.nextFloat() * -30f - 10f
+        val randomRotation = Random.nextFloat() * 360f
+
+        particles.add(
+            ConfettiParticle(
+                position = position,
+                velocity = Offset(randomXVelocity, randomYVelocity),
+                color = color,
+                size = size,
+                rotation = randomRotation
+            )
+        )
+    }
+
+    fun updateParticles() {
+        particles.removeAll { it.alpha <= 0f }
+        particles.forEach { particle ->
+            particle.position += particle.velocity
+            particle.velocity = Offset(particle.velocity.x, particle.velocity.y + 0.5f)
+            particle.alpha -= 0.01f
+        }
+    }
+}
+```
+* `addParticle`: adiciona um novo confetti na lista de confettis a partir de posição, velocidade e rotação aleatórias.
+* `updateParticle`: atualiza as propriedades do confetti como se fosse uma simulação física, removendo partículas invisíveis da lista de partículas e, para as partículas restantes, atualiza sua posição com base na velocidade atual, aumenta a velocidade simulando a gravidade e aumenta sua opacidade para que ela desapareça gradualmente.
+
+Por fim:
+* Aplicamos em nossa tela dentro de um _LaunchedEffect_ que criará novas partículas e as atualizará na lista a cada 50ms com propriedades aleatórias.
+* Desenhamos o confetti através do Canvas para cada partícula da lista aplicando rotação na mesma.
+```kotlin
+@Composable
+fun ConfettiAnimationCanvas(
+    modifier: Modifier = Modifier,
+    confettiState: ConfettiState = remember { ConfettiState() }
+) {
+    val colors = listOf(Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Magenta)
+
+    LaunchedEffect(key1 = Unit) {
+        while (true) {
+            delay(50)
+            confettiState.addParticle(
+                position = Offset(Random.nextFloat() * 1000f, 0f),
+                color = colors.random(),
+                size = Random.nextFloat() * 20f + 10f
+            )
+            confettiState.updateParticles()
+        }
+    }
+
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        confettiState.particles.forEach { particle ->
+            rotate(degrees = particle.rotation, pivot = particle.position) {
+                drawRect(
+                    color = particle.color,
+                    topLeft = Offset(particle.position.x - particle.size / 2, particle.position.y - particle.size / 2),
+                    size = Size(particle.size, particle.size),
+                    alpha = particle.alpha
+                )
+            }
+        }
+    }
+}
+```
+### Resultado:
+<img src="https://github.com/user-attachments/assets/4f0610be-a53e-4354-88e2-78c9c9a39c74" alt="Confetti Animation" width="300"/>
+
 ### Inspirações
 * [Biblioteca Konfetti por Daniel Martinus](https://github.com/DanielMartinus/Konfetti)
 * Estudo prático baseado no artigo de [Saravanai P. Ramanathan](https://medium.com/@saravanai.dev/jetpack-compose-confetti-7ad0629290fd)
+## 4. Segunda abordagem - Animações Compose
+Neste exemplo, foi animado uma box simples com três das propriedades que a animação precisaria ter: variações de cor, tamanho e visibilidade:
+```kotlin
+    var isBoxVisible by remember {
+        mutableStateOf(true)
+    }
+    var animateBackgroundColor by remember {
+        mutableStateOf(false)
+    }
+    var isBoxExpanded by remember {
+        mutableStateOf(false)
+    }
 
-Como foi feito no código:
+    val infiniteTransition = rememberInfiniteTransition()
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isBoxVisible) 1.0f else 0f,
+        animationSpec = tween(durationMillis = 1000)
+    )
 
-Resultado:
-<img src="https://github.com/user-attachments/assets/4f0610be-a53e-4354-88e2-78c9c9a39c74" alt="Confetti Animation" width="300"/>
+    val animatedColor by infiniteTransition.animateColor(
+        initialValue = if (animateBackgroundColor) Color.Blue else Color.Red,
+        targetValue = if (animateBackgroundColor) Color.Green else Color.Gray,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 2000,
+                easing = FastOutSlowInEasing,
+                delayMillis = 1000
+            ),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+
+    val animatedHeight by animateDpAsState(
+        targetValue = if (isBoxExpanded) 100.dp else 50.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessHigh
+        )
+    )
+
+    val animatedWidth by animateDpAsState(
+        targetValue = if (isBoxExpanded) 100.dp else 50.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessHigh
+        )
+    )
+
+    Box(
+        modifier = Modifier
+            .padding(bottom = 24.dp)
+            .size(animatedHeight, animatedWidth)
+            .graphicsLayer {
+                alpha = animatedAlpha
+            }
+            .clip(RoundedCornerShape(16.dp))
+            .background(animatedColor)
+            .animateContentSize(
+                animationSpec = tween(durationMillis = 1000)
+            )
+    )
+```
+### Curiosidades
+* O Compose usa por padrão animações **de mola**, ou animações baseadas em física, procure saber sonbre o [_animationSpec_](https://developer.android.com/develop/ui/compose/animation/customize?hl=pt-br#animationspec) usado nas animações acima, através dele pode-se personalizar o modo como a animação é executada.
+* A documentação oficial apresenta um [Guia rápido sobre animações no Compose](https://developer.android.com/develop/ui/compose/animation/quick-guide?hl=pt-br) que pode ser muito útil para iniciar seus estudos em animações composable.
+* A doc também disponibiliza um [Cheat Sheet de animações em Compose](http://developer.android.com/static/develop/ui/compose/images/compose_animation_cheat_sheet.png?hl=pt-br) que pode agilizar seu desenvolvimento.
+## 5. Terceira abordagem - AnimatedVectorDrawable
+AnimatedVectorDrawable, como o nome já sugere, aplica animações em vetores simples, basta carregar o arquivo drawable e alternar entre o estado final e inicia; do drawable:
+```kotlin
+@Composable
+fun AnimatedVectorDrawable() {
+    val image = AnimatedImageVector.animatedVectorResource(R.drawable.ic_hourglass_animated)
+    var atEnd by remember { mutableStateOf(false) }
+    Image(
+        painter = rememberAnimatedVectorPainter(image, atEnd),
+        contentDescription = "Timer",
+        modifier = Modifier.clickable {
+            atEnd = !atEnd
+        },
+        contentScale = ContentScale.Crop
+    )
+}
+```
+<img src="https://github.com/user-attachments/assets/25dc5bad-b83e-4346-8db0-491bd1b55a91" alt="Confetti Animation" width="300"/>
