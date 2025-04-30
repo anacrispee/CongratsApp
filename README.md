@@ -17,3 +17,7 @@ São criadas formas cujas propriedades se alteram de acordo com os laços: taman
 * [Biblioteca Konfetti por Daniel Martinus](https://github.com/DanielMartinus/Konfetti)
 * Estudo prático baseado no artigo de [Saravanai P. Ramanathan](https://medium.com/@saravanai.dev/jetpack-compose-confetti-7ad0629290fd)
 
+Como foi feito no código:
+
+Resultado:
+<img src="https://github.com/user-attachments/assets/4f0610be-a53e-4354-88e2-78c9c9a39c74" alt="Confetti Animation" width="300"/>
