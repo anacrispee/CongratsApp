@@ -1,4 +1,4 @@
-# Estudo de boas práticas em animações com Jetpack Compose
+# Boas práticas em animações com Jetpack Compose
 ## 1. Objetivo da pesquisa
 * Estudar as melhores práticas em animações no Android
 * Desenvolver uma animação Confetti conforme o [vídeo-exemplo](https://dribbble.com/shots/16973988-Perk-Hero-Level-Up-Animation) sugerido no desafio de apresentações semanais do grupo de estudos.
@@ -192,3 +192,70 @@ fun AnimatedVectorDrawable() {
 }
 ```
 <img src="https://github.com/user-attachments/assets/25dc5bad-b83e-4346-8db0-491bd1b55a91" alt="Confetti Animation" width="300"/>
+
+## 6. Quarta abordagem - Lottie
+Uma biblioteca para exibição de animações vetoriais em aplicativos mobile e web, que permite renderizar animações criadas e exportadas no formato JSON.
+Com ele, é possível adicionar animações leves e escaláveis sem comprometer o desempenho do app.
+
+Para utilizar o Lottie, deve-se adicionar sua dependência:
+
+**libs.versions.toml**
+```kotlin
+android-composeLottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "composeLottie" }
+```
+
+**build.gradle.kts**
+```kotlin
+    implementation(libs.android.composeLottie)
+```
+
+**sua_tela.kt**
+```kotlin
+@Composable
+fun Lottie() {
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            resId = R.raw.confettis
+        )
+    )
+    LottieAnimation(
+        composition = composition,
+        contentScale = ContentScale.Fit,
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(514.dp)
+    )
+}
+```
+## 7. Conclusão - Impacto na performance com as animações
+### 7.1. Animações com Canvas e laços de repetição
+A criação e atualização frequente de novas partículas que representam o Confetti, podem impactar no processador e memória do dispositivo, ainda mais dispositivos menos potentes, pois:
+* O código adiciona novas partículas a cada x milissegundos.
+* Possível queda de FPS com a renderização contínua do Canvas.
+* A cada frame o Canvas redesenha as partículas.
+* Possível excesso de recomposições no Compose.
+* Notation
+    * A adição de números na lista é O(1)
+    * Atualização de partículas (updateParticles) percorre todas as partículas e atualiza suas propriedades, sendo de complexidade O(n).
+    * A remoção de partículas também (removeAll)
+### 7.2. Animações Compose
+As animações no Compose podem causar problemas de desempenho por conta da própria natureza da animação, que é mover ou mudar pixels na tela rapidamente, frame por frame. 
+
+Considerando as diferentes fases do Compose (composição, layout e renderização), se a animação mudar a fase de layout, todos os elementos combináveis afetados serão reprojetados e redesenhados. 
+
+Se a animação ocorre na fase de renderização, então ela terá mais desempenho por padrão do que se ela fosse executada na fase de layout. 
+Referência: https://developer.android.com/develop/ui/compose/animation/quick-guide?hl=pt-br#optimize-performance  
+#### 7.2.1 Onde as animações compose melhor se adequam?
+As animações do Compose desempenham um papel fundamental na melhoria da experiência do usuário em plataformas digitais. 
+
+No entanto, são mais indicadas em guiar a atenção do usuário, sinalizar transições ou fornecer feedback sobre ações específicas, fazendo com que as interações pareçam fluidas e intuitivas. 
+
+_"Se as animações não forem cuidadosamente incorporadas, elas podem atrapalhar a experiência geral do usuário. Animações excessivamente complexas, longas ou redundantes podem se tornar fontes de distração e aborrecimento. Elas também podem contribuir para fazer com que um aplicativo pareça pesado ou lento, levando os usuários a potencialmente abandonar tarefas ou o aplicativo completamente."_
+
+Referência: https://dev.to/andreytzkt/animations-in-jetpack-compose-evolution-performance-and-testing-3ol6  
+### 7.3. Bibliotecas terceiras
+Ainda seriam executadas no mesmo ambiente, teriam os mesmos problemas de processamento. 
+#### 7.4. Lottie
+* **Ponto positivo:** Já estão renderizados, não seria necessária desenhar cada partícula dinamicamente, reduzindo uso do processamento e memória.
+* **Ponto negativo:** Por outro lado, pode não ser a melhor opção se quiser interações mais complexas, como em tempo real e com uso de física ou colisões. 
