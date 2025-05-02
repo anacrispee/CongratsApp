@@ -1,6 +1,6 @@
-<img src="https://github.com/user-attachments/assets/f60188d0-fd87-499a-8968-94014eafc8e6" width="600"/>
-
 # Boas práticas em animações com Jetpack Compose
+<img src="https://github.com/user-attachments/assets/34bc6a76-2bf2-42f1-b4ec-36d404b745d4" width="600" style="display:block; margin:0;"/>
+
 ## 1. Objetivo da pesquisa
 * Estudar as melhores práticas em animações no Android
 * Desenvolver uma animação Confetti conforme o [vídeo-exemplo](https://dribbble.com/shots/16973988-Perk-Hero-Level-Up-Animation) sugerido no desafio de apresentações semanais do grupo de estudos.
