@@ -167,9 +167,12 @@ Neste exemplo, foi animado uma box simples com três das propriedades que a anim
             .background(animatedColor)
             .animateContentSize(
                 animationSpec = tween(durationMillis = 1000)
-            )
+)
     )
 ```
+### Resultado
+<img src="https://github.com/user-attachments/assets/4ba9883d-b4bd-4f26-b9a4-bbe30c935a9c" alt="Confetti Animation" width="300"/>
+
 ### Curiosidades
 * O Compose usa por padrão animações **de mola**, ou animações baseadas em física, procure saber sonbre o [_animationSpec_](https://developer.android.com/develop/ui/compose/animation/customize?hl=pt-br#animationspec) usado nas animações acima, através dele pode-se personalizar o modo como a animação é executada.
 * A documentação oficial apresenta um [Guia rápido sobre animações no Compose](https://developer.android.com/develop/ui/compose/animation/quick-guide?hl=pt-br) que pode ser muito útil para iniciar seus estudos em animações composable.
@@ -191,6 +194,7 @@ fun AnimatedVectorDrawable() {
     )
 }
 ```
+### Resultado
 <img src="https://github.com/user-attachments/assets/25dc5bad-b83e-4346-8db0-491bd1b55a91" alt="Confetti Animation" width="300"/>
 
 ## 6. Quarta abordagem - Lottie
@@ -228,17 +232,16 @@ fun Lottie() {
     )
 }
 ```
+### Resultado
+<img src="https://github.com/user-attachments/assets/c0ff77f1-5052-4d7b-a671-699a2701f0d6" alt="Confetti Animation" width="300"/>
+
 ## 7. Conclusão - Impacto na performance com as animações
 ### 7.1. Animações com Canvas e laços de repetição
 A criação e atualização frequente de novas partículas que representam o Confetti, podem impactar no processador e memória do dispositivo, ainda mais dispositivos menos potentes, pois:
 * O código adiciona novas partículas a cada x milissegundos.
 * Possível queda de FPS com a renderização contínua do Canvas.
 * A cada frame o Canvas redesenha as partículas.
-* Possível excesso de recomposições no Compose.
-* Notation
-    * A adição de números na lista é O(1)
-    * Atualização de partículas (updateParticles) percorre todas as partículas e atualiza suas propriedades, sendo de complexidade O(n).
-    * A remoção de partículas também (removeAll)
+* Possível excesso de recomposições no Compose
 ### 7.2. Animações Compose
 As animações no Compose podem causar problemas de desempenho por conta da própria natureza da animação, que é mover ou mudar pixels na tela rapidamente, frame por frame. 
 
@@ -254,8 +257,6 @@ No entanto, são mais indicadas em guiar a atenção do usuário, sinalizar tran
 _"Se as animações não forem cuidadosamente incorporadas, elas podem atrapalhar a experiência geral do usuário. Animações excessivamente complexas, longas ou redundantes podem se tornar fontes de distração e aborrecimento. Elas também podem contribuir para fazer com que um aplicativo pareça pesado ou lento, levando os usuários a potencialmente abandonar tarefas ou o aplicativo completamente."_
 
 Referência: https://dev.to/andreytzkt/animations-in-jetpack-compose-evolution-performance-and-testing-3ol6  
-### 7.3. Bibliotecas terceiras
-Ainda seriam executadas no mesmo ambiente, teriam os mesmos problemas de processamento. 
-#### 7.4. Lottie
+### 7.3. Bibliotecas terceiras - Lottie
 * **Ponto positivo:** Já estão renderizados, não seria necessária desenhar cada partícula dinamicamente, reduzindo uso do processamento e memória.
 * **Ponto negativo:** Por outro lado, pode não ser a melhor opção se quiser interações mais complexas, como em tempo real e com uso de física ou colisões. 
