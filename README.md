@@ -1,5 +1,6 @@
+<img src="https://github.com/user-attachments/assets/6e506893-dd5e-4387-a4ce-37de6c9fd741"/>
+
 # Boas práticas em animações com Jetpack Compose
-<img src="https://github.com/user-attachments/assets/34bc6a76-2bf2-42f1-b4ec-36d404b745d4" width="600" style="display:block; margin:0;"/>
 
 ## 1. Objetivo da pesquisa
 * Estudar as melhores práticas em animações no Android
