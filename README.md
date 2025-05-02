@@ -254,7 +254,7 @@ As animações do Compose desempenham um papel fundamental na melhoria da experi
 
 No entanto, são mais indicadas em guiar a atenção do usuário, sinalizar transições ou fornecer feedback sobre ações específicas, fazendo com que as interações pareçam fluidas e intuitivas. 
 
-_"Se as animações não forem cuidadosamente incorporadas, elas podem atrapalhar a experiência geral do usuário. Animações excessivamente complexas, longas ou redundantes podem se tornar fontes de distração e aborrecimento. Elas também podem contribuir para fazer com que um aplicativo pareça pesado ou lento, levando os usuários a potencialmente abandonar tarefas ou o aplicativo completamente."_
+> _"Se as animações não forem cuidadosamente incorporadas, elas podem atrapalhar a experiência geral do usuário. Animações excessivamente complexas, longas ou redundantes podem se tornar fontes de distração e aborrecimento. Elas também podem contribuir para fazer com que um aplicativo pareça pesado ou lento, levando os usuários a potencialmente abandonar tarefas ou o aplicativo completamente."_
 
 Referência: https://dev.to/andreytzkt/animations-in-jetpack-compose-evolution-performance-and-testing-3ol6  
 ### 7.3. Bibliotecas terceiras - Lottie
